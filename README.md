@@ -1,55 +1,43 @@
 # POS Ingheng
 
-Intermediate POS system for a school supply and general merchandise store, built with Django and MySQL. The implementation prioritizes barcode scan speed, rapid transaction flow, and a keyboard-first cashier UI. All pricing is in Philippine Peso (PHP / ₱).
+POS Ingheng is a barcode-first point-of-sale system for school supply and general merchandise stores.
+It is built with Django 5.2 and optimized for fast cashier throughput, inventory control, and admin workflows.
+All currency values are in Philippine Peso (PHP / P).
 
-## Highlights
+## Current Features
 
-- Barcode-first cashier screen tuned for keyboard wedge scanners.
-- Session/cache-backed cart so scans do not write to the database until checkout.
-- Atomic checkout with row locking to prevent overselling under concurrent cashiers.
-- Inventory CRUD, CSV/XLSX import, CSV export, low-stock monitoring, receipts, and sales reporting.
-- REST endpoints for product lookup and mobile inventory updates.
-- Optional camera scanning using the browser Barcode Detector API when supported.
-
-## Documentation
-
-- Full system guide: [docs/SYSTEM_GUIDE.md](docs/SYSTEM_GUIDE.md)
-- Sample seed import file: [seed_data/products.csv](seed_data/products.csv)
+- Fast cashier terminal with scanner-friendly input and automatic scan submission.
+- Session/cache-backed cart (items are finalized only on checkout).
+- Stock-safe checkout flow that prevents overselling.
+- Product management with SKU generation and optional barcode auto-generation.
+- Inventory tools split by purpose:
+	- Catalog import/update (products).
+	- Stock-in import (quantity increases only, with stock movement history).
+- Barcode label printing (single product, selected products, or all products).
+- Receipt output options:
+	- Standard receipt page.
+	- Thermal receipt page.
+	- A4 PDF and thermal PDF downloads.
+- Reports: gross sales, transactions, items sold, top products, date filtering.
+- Admin user management: create/edit cashier/admin accounts and activate/deactivate users.
+- Product/customer APIs for authenticated internal usage.
 
 ## Tech Stack
 
 - Python 3.12
-- Django 5
-- Django REST framework
-- MySQL 8
+- Django 5.2.1
+- Django REST Framework 3.16
+- SQLite (default local) or MySQL (via environment settings)
 - PyMySQL
-- openpyxl
-- reportlab
+- openpyxl and pandas (import processing)
+- reportlab (receipt and barcode PDFs)
 
-## Database Schema
+## Project Notes
 
-Core tables:
-
-- `posapp_user`: custom Django user with `role` field (`admin`, `cashier`).
-- `posapp_product`: inventory master with indexed `barcode`, indexed `name`, stock and reorder data.
-- `posapp_customer`: optional customer records.
-- `posapp_saletransaction`: checkout header with indexed `receipt_number` and `created_at`.
-- `posapp_saleitem`: checkout line items.
-- `posapp_stockmovement`: audit trail for imports, manual updates, and sales deductions.
-
-Performance-related indexes are defined on barcode, product name/activity, category/activity, receipt number, and transaction date.
-
-## Barcode Handling
-
-USB barcode scanners that act as keyboards are the default path:
-
-1. Cashier lands on the terminal page with focus on the barcode field.
-2. Scanner types the barcode and usually sends Enter.
-3. Frontend posts the barcode to `/terminal/scan/`.
-4. Server performs an indexed barcode lookup and updates the in-memory cart.
-5. Response returns the updated line and totals immediately.
-
-This keeps the scan path short and avoids transaction table writes until checkout. For camera-based scanning, the page includes optional browser-side detection with `BarcodeDetector` when available.
+- Custom auth model: `posapp.User` with role (`admin` or `cashier`).
+- Cache backend is local memory by default (`LocMemCache`).
+- Scanner path uses indexed barcode lookups and minimal payload responses.
+- Checkout and stock deduction are handled in an atomic flow.
 
 ## Local Setup
 
@@ -60,24 +48,37 @@ This keeps the scan path short and avoids transaction table writes until checkou
 pip install -r requirements.txt
 ```
 
-3. Copy `.env.example` to `.env` and adjust database settings.
-4. Run MySQL and create the database if needed.
-5. Apply migrations:
+3. Copy `.env.example` to `.env` and adjust values if needed.
+4. Run migrations:
 
 ```powershell
 python manage.py migrate
 ```
 
-6. Load sample data:
+5. Seed products and default users:
 
 ```powershell
 python manage.py seed_pos_data
 ```
 
-7. Start the server:
+6. Start the server:
 
 ```powershell
 python manage.py runserver
+```
+
+### Windows one-click launcher
+
+Use either launcher from the project root to start the server and open the login page automatically:
+
+```powershell
+run_pos.bat
+```
+
+or
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\run_pos.ps1
 ```
 
 Default seeded accounts:
@@ -85,23 +86,32 @@ Default seeded accounts:
 - Admin: `admin` / `admin12345`
 - Cashier: `cashier` / `cashier12345`
 
-## Docker Setup
+## Database Configuration
 
-1. Copy `.env.example` to `.env`.
-2. Start services:
+The app supports two database modes via `DB_ENGINE` in `.env`:
 
-```powershell
-docker compose up --build
-```
+- `sqlite` (default): uses `db.sqlite3`.
+- `mysql`: uses environment-driven MySQL connection settings.
 
-3. Open `http://127.0.0.1:8000`.
-4. If you need host access to container MySQL, use `127.0.0.1:3307` (container port remains 3306).
+## Key Admin Routes
 
-## Inventory Import Format
+- `/products/` product list and management.
+- `/products/import/` catalog import.
+- `/products/stock-in/` stock-in import.
+- `/products/export/` product export CSV.
+- `/products/export/stock-template/` stock-in template CSV.
+- `/products/export/stock-levels/` stock level export CSV.
+- `/products/barcodes/` barcode label PDF generation.
+- `/users/` account management.
+- `/users/add/` create admin/cashier account.
 
-Supported file types: CSV and XLSX.
+## Import Formats
 
-Columns:
+### Catalog Import (`/products/import/`)
+
+Supported upload formats: CSV and Excel workbook.
+
+Expected columns:
 
 - `sku`
 - `barcode`
@@ -114,29 +124,44 @@ Columns:
 - `reorder_level`
 - `is_active`
 
-See [seed_data/products.csv](seed_data/products.csv) for a working sample.
+### Stock-In Import (`/products/stock-in/`)
+
+Expected columns:
+
+- `barcode` or `sku` (at least one)
+- `stock_in_quantity`
+- `reference` (optional)
+
+Sample files are available in:
+
+- `seed_data/products.csv`
+- `seed_data/import_samples/`
+
+## Management Commands
+
+- Seed baseline data:
+
+```powershell
+python manage.py seed_pos_data
+```
+
+- Reset transactional and inventory data:
+
+```powershell
+python manage.py reset_pos_data
+python manage.py reset_pos_data --yes
+python manage.py reset_pos_data --yes --reseed
+python manage.py reset_pos_data --yes --include-users
+```
 
 ## API Endpoints
 
-- `GET /api/products/?q=term`
+- `GET /api/products/?q=<term>&barcode=<code>`
 - `GET /api/products/<id>/`
 - `PATCH /api/products/<id>/`
-- `POST /api/scan/` with JSON `{ "barcode": "..." }`
+- `POST /api/scan/` with JSON body `{ "barcode": "..." }`
 
-## Reporting
+## Documentation
 
-- Dashboard summary
-- Daily and date-range sales report
-- Top-selling products
-- Low-stock view
-
-## Notes On Performance
-
-- Barcode lookups use an indexed `barcode` column.
-- Terminal scans load only the minimum product fields needed for scan-time response.
-- Active cart state is stored in cache to avoid repeated writes during scanning.
-- Checkout uses `select_for_update()` and bulk inserts for sale items and stock movements.
-- Product search is constrained and paginated at the view layer for quick operator feedback.
-
-For full operating instructions, deployment workflow, barcode scanner handling, and troubleshooting, see [docs/SYSTEM_GUIDE.md](docs/SYSTEM_GUIDE.md).
+- System guide: [docs/SYSTEM_GUIDE.md](docs/SYSTEM_GUIDE.md)
 
