@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% block title %}{{ page_title }} · POS Ingheng{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>{{ page_title }}</h2>
+    <a href="{% url 'user_list' %}" class="btn">← Back to Users</a>
+</div>
+
+<div class="card form-card">
+    <form method="post" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="form-errors">
+            {% for error in form.non_field_errors %}
+            <p class="error">{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="{{ form.username.id_for_label }}">Username <span class="required">*</span></label>
+                {{ form.username }}
+                {% if form.username.errors %}<p class="field-error">{{ form.username.errors.0 }}</p>{% endif %}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.role.id_for_label }}">Role <span class="required">*</span></label>
+                {{ form.role }}
+                {% if form.role.errors %}<p class="field-error">{{ form.role.errors.0 }}</p>{% endif %}
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="{{ form.first_name.id_for_label }}">First Name</label>
+                {{ form.first_name }}
+                {% if form.first_name.errors %}<p class="field-error">{{ form.first_name.errors.0 }}</p>{% endif %}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.last_name.id_for_label }}">Last Name</label>
+                {{ form.last_name }}
+                {% if form.last_name.errors %}<p class="field-error">{{ form.last_name.errors.0 }}</p>{% endif %}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.email.id_for_label }}">Email</label>
+            {{ form.email }}
+            {% if form.email.errors %}<p class="field-error">{{ form.email.errors.0 }}</p>{% endif %}
+        </div>
+
+        {% if is_create %}
+        <div class="form-row">
+            <div class="form-group">
+                <label for="{{ form.password1.id_for_label }}">Password <span class="required">*</span></label>
+                {{ form.password1 }}
+                {% if form.password1.errors %}<p class="field-error">{{ form.password1.errors.0 }}</p>{% endif %}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.password2.id_for_label }}">Confirm Password <span class="required">*</span></label>
+                {{ form.password2 }}
+                {% if form.password2.errors %}<p class="field-error">{{ form.password2.errors.0 }}</p>{% endif %}
+            </div>
+        </div>
+        {% else %}
+        <div class="form-group">
+            <label for="{{ form.new_password.id_for_label }}">New Password</label>
+            {{ form.new_password }}
+            <small class="help-text">{{ form.new_password.help_text }}</small>
+            {% if form.new_password.errors %}<p class="field-error">{{ form.new_password.errors.0 }}</p>{% endif %}
+        </div>
+        <div class="form-group checkbox-group">
+            {{ form.is_active }}
+            <label for="{{ form.is_active.id_for_label }}">Account is active</label>
+            {% if form.is_active.errors %}<p class="field-error">{{ form.is_active.errors.0 }}</p>{% endif %}
+        </div>
+        {% endif %}
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                {% if is_create %}Create Account{% else %}Save Changes{% endif %}
+            </button>
+            <a href="{% url 'user_list' %}" class="btn">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

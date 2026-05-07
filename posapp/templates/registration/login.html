@@ -1,28 +1,150 @@
-{% extends 'base.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In · POS Ingheng</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&display=swap">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; }
 
-{% block title %}Login | POS Ingheng{% endblock %}
+        body {
+            margin: 0;
+            font-family: "Barlow", sans-serif;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            background: #f2ede4;
+            background-image:
+                radial-gradient(circle at 20% 20%, rgba(12,124,89,0.10) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(202,103,2,0.08) 0%, transparent 50%);
+            padding: 1.5rem;
+        }
 
-{% block content %}
-<section class="auth-panel">
-    <div class="card auth-card">
-        <div>
-            <p class="eyebrow">School Supply POS</p>
-            <h2>Cashier Login</h2>
-            <p>Barcode-focused checkout for fast in-store sales.</p>
+        .card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 2.25rem 2.5rem 2rem;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04), 0 12px 40px rgba(0,0,0,0.10);
+        }
+
+        .brand { margin-bottom: 2rem; }
+
+        .brand-name {
+            margin: 0 0 0.2rem;
+            font-size: 1.45rem;
+            font-weight: 700;
+            color: #1f2421;
+            letter-spacing: -0.02em;
+        }
+
+        .brand-sub {
+            margin: 0;
+            font-size: 0.8rem;
+            color: #5f665d;
+        }
+
+        .field { margin-bottom: 1.1rem; }
+
+        .field label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #5f665d;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 0.4rem;
+        }
+
+        .field input {
+            display: block;
+            width: 100%;
+            padding: 0.82rem 1rem;
+            border: 1.5px solid #e2ddd6;
+            border-radius: 10px;
+            font-family: "Barlow", sans-serif;
+            font-size: 0.95rem;
+            color: #1f2421;
+            background: #faf8f5;
+            transition: border-color 0.18s, box-shadow 0.18s;
+            outline: none;
+        }
+
+        .field input:focus {
+            border-color: #0c7c59;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(12,124,89,0.12);
+        }
+
+        .submit-btn {
+            display: block;
+            width: 100%;
+            margin-top: 1.5rem;
+            padding: 0.95rem;
+            border: none;
+            border-radius: 11px;
+            background: #0c7c59;
+            color: #fff;
+            font-family: "Barlow", sans-serif;
+            font-weight: 700;
+            font-size: 0.97rem;
+            cursor: pointer;
+            letter-spacing: 0.02em;
+            transition: background 0.18s, transform 0.12s;
+        }
+
+        .submit-btn:hover { background: #085d43; transform: translateY(-1px); }
+        .submit-btn:active { transform: translateY(0); }
+
+        .error-box {
+            margin-bottom: 1rem;
+            padding: 0.7rem 0.9rem;
+            background: #fff4e6;
+            border: 1px solid #f5c57a;
+            border-radius: 9px;
+            color: #92400e;
+            font-size: 0.85rem;
+            line-height: 1.45;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.72rem;
+            color: #b0a89e;
+            letter-spacing: 0.04em;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="brand">
+            <h1 class="brand-name">POS Ingheng</h1>
+            <p class="brand-sub">School Supply &amp; General Merchandise</p>
         </div>
-        <form method="post" class="stack-form">
+
+        {% if form.non_field_errors %}
+        <div class="error-box">
+            {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="post">
             {% csrf_token %}
-            {{ form.non_field_errors }}
-            <label>
-                <span>Username</span>
+            <div class="field">
+                <label for="{{ form.username.id_for_label }}">Username</label>
                 {{ form.username }}
-            </label>
-            <label>
-                <span>Password</span>
+            </div>
+            <div class="field">
+                <label for="{{ form.password.id_for_label }}">Password</label>
                 {{ form.password }}
-            </label>
-            <button type="submit">Sign in</button>
+            </div>
+            <button type="submit" class="submit-btn">Sign in</button>
         </form>
     </div>
-</section>
-{% endblock %}
+    <p class="footer">POS Ingheng &copy; 2026</p>
+</body>
+</html>

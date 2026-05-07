@@ -13,8 +13,8 @@ from rest_framework import generics, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .forms import CheckoutForm, CustomerForm, ImportProductsForm, ProductForm, ReportFilterForm, StockImportForm
-from .models import Customer, Product, SaleTransaction
+from .forms import CheckoutForm, CustomerForm, ImportProductsForm, ProductForm, ReportFilterForm, StockImportForm, UserCreateForm, UserEditForm
+from .models import Customer, Product, SaleTransaction, User
 from .serializers import ProductSerializer
 from .services import (
     build_product_barcodes_pdf,
@@ -263,6 +263,51 @@ def customers_view(request):
         return redirect("customers")
     customers = Customer.objects.order_by("name")[:200]
     return render(request, "posapp/customers.html", {"form": form, "customers": customers})
+
+
+@login_required
+def user_list(request):
+    ensure_admin(request)
+    users = User.objects.order_by("role", "username")
+    return render(request, "posapp/user_list.html", {"users": users})
+
+
+@login_required
+def user_create(request):
+    ensure_admin(request)
+    form = UserCreateForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        user = form.save()
+        messages.success(request, f"Account '{user.username}' created successfully.")
+        return redirect("user_list")
+    return render(request, "posapp/user_form.html", {"form": form, "page_title": "Create Account", "is_create": True})
+
+
+@login_required
+def user_edit(request, pk):
+    ensure_admin(request)
+    target_user = get_object_or_404(User, pk=pk)
+    form = UserEditForm(request.POST or None, instance=target_user)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, f"Account '{target_user.username}' updated.")
+        return redirect("user_list")
+    return render(request, "posapp/user_form.html", {"form": form, "page_title": f"Edit {target_user.username}", "target_user": target_user, "is_create": False})
+
+
+@login_required
+@require_POST
+def user_toggle_active(request, pk):
+    ensure_admin(request)
+    target_user = get_object_or_404(User, pk=pk)
+    if target_user == request.user:
+        messages.error(request, "You cannot deactivate your own account.")
+        return redirect("user_list")
+    target_user.is_active = not target_user.is_active
+    target_user.save(update_fields=["is_active"])
+    status = "activated" if target_user.is_active else "deactivated"
+    messages.success(request, f"Account '{target_user.username}' {status}.")
+    return redirect("user_list")
 
 
 class IsAdminOrReadOnly(permissions.BasePermission):

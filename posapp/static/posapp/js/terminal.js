@@ -11,12 +11,45 @@ const clearCartButton = document.getElementById("clear-cart");
 const cameraButton = document.getElementById("toggle-camera");
 const cameraPanel = document.getElementById("camera-panel");
 const cameraPreview = document.getElementById("camera-preview");
+const checkoutModal = document.getElementById("checkout-modal");
+const checkoutModalMessage = document.getElementById("checkout-modal-message");
+const printThermalButton = document.getElementById("print-thermal");
+const printA4Button = document.getElementById("print-a4");
+const skipPrintButton = document.getElementById("skip-print");
 
 let videoStream = null;
 let detector = null;
 let scanLoopHandle = null;
 let isProcessingScan = false;
 let barcodeTimeout = null;
+let isCheckoutModalOpen = false;
+let latestReceiptUrl = "";
+
+function openCheckoutModal(receiptNumber, receiptUrl) {
+    latestReceiptUrl = receiptUrl;
+    isCheckoutModalOpen = true;
+    checkoutModalMessage.textContent = `Receipt ${receiptNumber} created. Print now?`;
+    checkoutModal.classList.remove("hidden");
+}
+
+function closeCheckoutModal() {
+    isCheckoutModalOpen = false;
+    checkoutModal.classList.add("hidden");
+}
+
+function continueAfterCheckout() {
+    closeCheckoutModal();
+    renderCart([], { subtotal: 0, tax: 0, total: 0 });
+    setFeedback("Checkout complete. Ready for next customer.");
+    barcodeInput.focus();
+}
+
+function openPrintWindow(url) {
+    const printWindow = window.open(url, "_blank", "noopener,noreferrer");
+    if (!printWindow) {
+        setFeedback("Popup blocked. Please allow popups to print receipt.", true);
+    }
+}
 
 function setFeedback(message, isError = false) {
     feedback.textContent = message;
@@ -202,12 +235,41 @@ cartBody?.addEventListener("change", async (event) => {
 
 checkoutForm?.addEventListener("submit", async (event) => {
     event.preventDefault();
+    if (isCheckoutModalOpen) {
+        return;
+    }
     try {
         const formData = new FormData(checkoutForm);
         const data = await postForm("/terminal/checkout/", Object.fromEntries(formData.entries()));
-        window.location.href = data.receipt_url;
+        openCheckoutModal(data.receipt_number, data.receipt_url);
     } catch (error) {
         setFeedback(error.message, true);
+    }
+});
+
+printThermalButton?.addEventListener("click", () => {
+    if (!latestReceiptUrl) {
+        return;
+    }
+    openPrintWindow(`${latestReceiptUrl}?format=thermal-pdf`);
+    continueAfterCheckout();
+});
+
+printA4Button?.addEventListener("click", () => {
+    if (!latestReceiptUrl) {
+        return;
+    }
+    openPrintWindow(`${latestReceiptUrl}?format=pdf`);
+    continueAfterCheckout();
+});
+
+skipPrintButton?.addEventListener("click", () => {
+    continueAfterCheckout();
+});
+
+document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && isCheckoutModalOpen) {
+        continueAfterCheckout();
     }
 });
 
@@ -225,6 +287,9 @@ clearCartButton?.addEventListener("click", async () => {
 // STICKY FOCUS: Keep barcode input as primary target for scanner
 // Refocus barcode input when user clicks away or blurs
 barcodeInput?.addEventListener("blur", (event) => {
+    if (isCheckoutModalOpen) {
+        return;
+    }
     // Don't refocus if user is submitting checkout
     if (event.relatedTarget?.closest("form#checkout-form")) {
         return;
@@ -266,6 +331,9 @@ document.addEventListener("keydown", (event) => {
 
 // Intercept clicks on quantity inputs to allow editing, then refocus barcode
 document.addEventListener("click", (event) => {
+    if (isCheckoutModalOpen) {
+        return;
+    }
     if (event.target.classList.contains("qty-input")) {
         // Allow quantity input to be edited
         // Focus will be restored after change event (see cartBody change listener)

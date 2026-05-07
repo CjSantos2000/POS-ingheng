@@ -73,6 +73,63 @@
         </form>
     </article>
 </section>
+
+<div id="checkout-modal" class="checkout-modal hidden" role="dialog" aria-modal="true" aria-labelledby="checkout-modal-title">
+    <div class="checkout-modal-card">
+        <h3 id="checkout-modal-title">Checkout Complete</h3>
+        <p id="checkout-modal-message">Receipt created successfully.</p>
+        <div class="checkout-modal-actions">
+            <button id="print-thermal" type="button" class="button-link">Print Thermal</button>
+            <button id="print-a4" type="button" class="ghost-button">Print A4</button>
+            <button id="skip-print" type="button" class="ghost-button">Skip Print</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .checkout-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 50;
+        padding: 1rem;
+    }
+
+    .checkout-modal.hidden {
+        display: none;
+    }
+
+    .checkout-modal-card {
+        width: min(420px, 100%);
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 1rem;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .checkout-modal-card h3 {
+        margin: 0 0 0.5rem;
+    }
+
+    .checkout-modal-card p {
+        margin: 0 0 1rem;
+        color: #374151;
+    }
+
+    .checkout-modal-actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .checkout-modal-actions button {
+        flex: 1;
+        min-width: 120px;
+    }
+</style>
 {% endblock %}
 
 {% block scripts %}

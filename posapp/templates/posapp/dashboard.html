@@ -1,59 +1,310 @@
 {% extends 'base.html' %}
 
-{% block title %}Dashboard | POS Ingheng{% endblock %}
+{% block title %}Dashboard · POS Ingheng{% endblock %}
+
+{% block extra_head %}
+<style>
+/* ── Hero ───────────────────────────────────── */
+.db-hero {
+    background: linear-gradient(135deg, #0a5238 0%, #0d7a50 55%, #085030 100%);
+    border-radius: 22px;
+    padding: 1.75rem 2rem;
+    color: #fff;
+    margin-bottom: 1.25rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 12px 40px rgba(8,80,48,0.30);
+}
+.db-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px);
+    background-size: 20px 20px;
+    pointer-events: none;
+}
+.db-hero::after {
+    content: "";
+    position: absolute;
+    top: -70px; right: -70px;
+    width: 240px; height: 240px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+    pointer-events: none;
+}
+.db-hero-inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+.db-hero-date {
+    margin: 0 0 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.6;
+}
+.db-hero-title {
+    margin: 0;
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+.db-hero-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.75rem 1.3rem;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 12px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: background 0.18s, transform 0.12s;
+    white-space: nowrap;
+}
+.db-hero-btn:hover { background: rgba(255,255,255,0.24); transform: translateY(-1px); }
+
+/* ── Stat cards ─────────────────────────────── */
+.db-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+.db-stat {
+    background: var(--panel);
+    border: 1px solid rgba(255,255,255,0.65);
+    backdrop-filter: blur(18px);
+    box-shadow: 0 4px 20px rgba(32,29,22,0.08);
+    border-radius: 20px;
+    padding: 1.4rem;
+    position: relative;
+    overflow: hidden;
+}
+.db-stat-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+.db-stat-label {
+    margin: 0 0 0.25rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+.db-stat-value {
+    margin: 0;
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.1;
+    word-break: break-all;
+}
+.db-stat-sub {
+    margin: 0.4rem 0 0;
+    font-size: 0.76rem;
+    color: var(--muted);
+}
+
+/* ── Quick tiles ────────────────────────────── */
+.db-quick {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+.db-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+    padding: 1.25rem;
+    background: var(--panel);
+    border: 1px solid rgba(255,255,255,0.65);
+    backdrop-filter: blur(18px);
+    box-shadow: 0 4px 18px rgba(32,29,22,0.07);
+    border-radius: 18px;
+    text-decoration: none;
+    color: var(--ink);
+    transition: transform 0.16s, box-shadow 0.16s;
+}
+.db-tile:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(32,29,22,0.13); }
+.db-tile-icon {
+    width: 42px; height: 42px;
+    border-radius: 11px;
+    background: rgba(12,124,89,0.10);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-bottom: 0.25rem;
+}
+.db-tile-name { font-weight: 700; font-size: 0.95rem; }
+.db-tile-desc { font-size: 0.74rem; color: var(--muted); line-height: 1.4; }
+
+/* ── Bottom two-col ─────────────────────────── */
+.db-bottom {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 1.25rem;
+}
+.db-section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.9rem;
+}
+.db-section-head h3 { margin: 0; font-size: 1rem; }
+.db-section-head a { font-size: 0.8rem; color: var(--accent); font-weight: 600; text-decoration: none; }
+.db-product-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--line);
+}
+.db-product-row:last-child { border-bottom: none; }
+.db-rank {
+    width: 24px; height: 24px;
+    border-radius: 7px;
+    background: rgba(12,124,89,0.10);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem; font-weight: 700;
+    color: var(--accent); flex-shrink: 0;
+}
+.db-pname { flex: 1; font-size: 0.88rem; font-weight: 500; }
+.db-pqty { font-size: 0.76rem; color: var(--muted); white-space: nowrap; }
+.db-prev { font-weight: 700; font-size: 0.86rem; white-space: nowrap; }
+.text-critical { color: #c0392b; font-weight: 700; }
+.text-warning  { color: var(--warning); font-weight: 600; }
+
+@media (max-width: 1100px) {
+    .db-stats, .db-quick, .db-bottom { grid-template-columns: 1fr; }
+}
+</style>
+{% endblock %}
 
 {% block content %}
-<section class="page-header">
-    <div>
-        <p class="eyebrow">Operations Overview</p>
-        <h2>Store Dashboard</h2>
-    </div>
-    <a href="{% url 'pos_terminal' %}" class="button-link">Open Terminal</a>
-</section>
 
-<section class="metrics-grid">
-    <article class="card metric-card">
-        <span>Gross Sales</span>
-        <strong>₱{{ metrics.gross_sales }}</strong>
-    </article>
-    <article class="card metric-card">
-        <span>Transactions</span>
-        <strong>{{ metrics.transaction_count }}</strong>
-    </article>
-    <article class="card metric-card">
-        <span>Items Sold</span>
-        <strong>{{ metrics.items_sold }}</strong>
-    </article>
-</section>
-
-<section class="card">
-    <div class="section-title-row">
-        <h3>Low Stock Alerts</h3>
-        <a href="{% url 'low_stock' %}">View all</a>
+<!-- Hero -->
+<div class="db-hero">
+    <div class="db-hero-inner">
+        <div>
+            <p class="db-hero-date">{% now "l, N j, Y" %}</p>
+            <h2 class="db-hero-title">Good day, {{ request.user.first_name|default:request.user.username }} 👋</h2>
+        </div>
+        <a href="{% url 'pos_terminal' %}" class="db-hero-btn">Open Terminal &rarr;</a>
     </div>
-    <table>
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Barcode</th>
-                <th>Stock</th>
-                <th>Reorder</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for product in low_stock_products %}
-            <tr>
-                <td>{{ product.name }}</td>
-                <td>{{ product.barcode }}</td>
-                <td>{{ product.stock_quantity }}</td>
-                <td>{{ product.reorder_level }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="4">No low-stock items.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</section>
+</div>
+
+<!-- Stats -->
+<div class="db-stats">
+    <div class="db-stat">
+        <div class="db-stat-icon" style="background:rgba(12,124,89,0.10)">💰</div>
+        <p class="db-stat-label">Gross Sales</p>
+        <p class="db-stat-value">₱{{ metrics.gross_sales|floatformat:2 }}</p>
+        <p class="db-stat-sub">All-time revenue</p>
+    </div>
+    <div class="db-stat">
+        <div class="db-stat-icon" style="background:rgba(37,99,235,0.09)">🧾</div>
+        <p class="db-stat-label">Transactions</p>
+        <p class="db-stat-value">{{ metrics.transaction_count }}</p>
+        <p class="db-stat-sub">Total orders processed</p>
+    </div>
+    <div class="db-stat">
+        <div class="db-stat-icon" style="background:rgba(202,103,2,0.10)">📦</div>
+        <p class="db-stat-label">Items Sold</p>
+        <p class="db-stat-value">{{ metrics.items_sold }}</p>
+        <p class="db-stat-sub">Units across all sales</p>
+    </div>
+</div>
+
+<!-- Quick actions -->
+<div class="db-quick">
+    <a href="{% url 'pos_terminal' %}" class="db-tile">
+        <div class="db-tile-icon">🔍</div>
+        <span class="db-tile-name">POS Terminal</span>
+        <span class="db-tile-desc">Scan barcodes &amp; process sales</span>
+    </a>
+    <a href="{% url 'product_list' %}" class="db-tile">
+        <div class="db-tile-icon">📋</div>
+        <span class="db-tile-name">Products</span>
+        <span class="db-tile-desc">Manage inventory catalog</span>
+    </a>
+    <a href="{% url 'reports' %}" class="db-tile">
+        <div class="db-tile-icon">📊</div>
+        <span class="db-tile-name">Reports</span>
+        <span class="db-tile-desc">Sales analytics &amp; insights</span>
+    </a>
+</div>
+
+<!-- Bottom row -->
+<div class="db-bottom">
+
+    <section class="card">
+        <div class="db-section-head">
+            <h3>Top Products</h3>
+            <a href="{% url 'reports' %}">Full report &rarr;</a>
+        </div>
+        {% if metrics.top_products %}
+        {% for item in metrics.top_products %}
+        <div class="db-product-row">
+            <div class="db-rank">{{ forloop.counter }}</div>
+            <span class="db-pname">{{ item.product__name }}</span>
+            <span class="db-pqty">{{ item.quantity_sold }} sold</span>
+            <span class="db-prev">₱{{ item.revenue|floatformat:2 }}</span>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p style="color:var(--muted);font-size:0.9rem;margin:0">No sales data yet.</p>
+        {% endif %}
+    </section>
+
+    <section class="card">
+        <div class="db-section-head">
+            <h3>Low Stock Alerts</h3>
+            <a href="{% url 'low_stock' %}">View all &rarr;</a>
+        </div>
+        {% if low_stock_products %}
+        <table>
+            <thead>
+                <tr><th>Product</th><th>Stock</th><th>Reorder</th></tr>
+            </thead>
+            <tbody>
+                {% for product in low_stock_products %}
+                <tr>
+                    <td>{{ product.name }}</td>
+                    <td>
+                        {% if product.stock_quantity == 0 %}
+                        <span class="text-critical">0 — Out</span>
+                        {% else %}
+                        <span class="text-warning">{{ product.stock_quantity }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ product.reorder_level }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p style="color:var(--accent);font-size:0.9rem;margin:0;font-weight:600">✓ All products well-stocked.</p>
+        {% endif %}
+    </section>
+
+</div>
+
 {% endblock %}
