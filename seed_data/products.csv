@@ -1,0 +1,11 @@
+sku,barcode,name,category,description,cost_price,selling_price,stock_quantity,reorder_level,is_active
+NBK-001,8851010000010,Exercise Notebook,School Supplies,80-page ruled notebook,0.40,0.75,150,20,true
+PEN-001,8851010000027,Blue Ballpen,School Supplies,Smooth writing blue ink pen,0.12,0.25,300,40,true
+PCL-001,8851010000034,2B Pencil,School Supplies,Standard wooden pencil,0.08,0.18,250,30,true
+ERS-001,8851010000041,White Eraser,School Supplies,Soft eraser for school use,0.07,0.20,120,15,true
+RUL-001,8851010000058,30cm Ruler,School Supplies,Clear plastic ruler,0.18,0.45,80,10,true
+SNK-001,8851010000065,Chocolate Wafer,Snacks,Single-serving wafer snack,0.22,0.45,90,12,true
+DRK-001,8851010000072,Bottled Water,Drinks,500ml drinking water,0.18,0.35,110,20,true
+TIS-001,8851010000089,Pocket Tissue,General Merchandise,Travel-size tissue pack,0.15,0.30,70,15,true
+BAT-001,8851010000096,AA Battery Pair,General Merchandise,Two-pack alkaline batteries,0.70,1.25,40,8,true
+GLU-001,8851010000102,Glue Stick,School Supplies,Medium glue stick,0.25,0.60,60,10,true

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Import Products | POS Ingheng{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div>
+        <p class="eyebrow">Inventory</p>
+        <h2>Import Products</h2>
+    </div>
+</section>
+
+<section class="card form-card">
+    <form method="post" enctype="multipart/form-data" class="stack-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Import</button>
+    </form>
+</section>
+{% endblock %}

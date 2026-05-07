@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} | POS Ingheng{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div>
+        <p class="eyebrow">Inventory</p>
+        <h2>{{ title }}</h2>
+    </div>
+</section>
+
+<section class="card form-card">
+    <form method="post" class="stack-form two-column-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="full-span">
+            <button type="submit">Save Product</button>
+        </div>
+    </form>
+</section>
+{% endblock %}

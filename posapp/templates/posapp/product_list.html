@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Products | POS Ingheng{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div>
+        <p class="eyebrow">Inventory</p>
+        <h2>Products</h2>
+    </div>
+    <div class="terminal-actions">
+        <a href="{% url 'product_import' %}" class="ghost-button">Import</a>
+        <a href="{% url 'product_export' %}" class="ghost-button">Export CSV</a>
+        <a href="{% url 'product_create' %}" class="button-link">Add Product</a>
+    </div>
+</section>
+
+<section class="card">
+    <form method="get" class="search-row">
+        <input type="search" name="q" value="{{ query }}" placeholder="Search name, barcode, or SKU">
+        <button type="submit">Search</button>
+    </form>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Barcode</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+            <tr>
+                <td>{{ product.name }}</td>
+                <td>{{ product.barcode }}</td>
+                <td>${{ product.selling_price }}</td>
+                <td>{{ product.stock_quantity }}</td>
+                <td><a href="{% url 'product_edit' product.id %}">Edit</a></td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">No products found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

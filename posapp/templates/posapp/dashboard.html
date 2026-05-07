@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard | POS Ingheng{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div>
+        <p class="eyebrow">Operations Overview</p>
+        <h2>Store Dashboard</h2>
+    </div>
+    <a href="{% url 'pos_terminal' %}" class="button-link">Open Terminal</a>
+</section>
+
+<section class="metrics-grid">
+    <article class="card metric-card">
+        <span>Gross Sales</span>
+        <strong>${{ metrics.gross_sales }}</strong>
+    </article>
+    <article class="card metric-card">
+        <span>Transactions</span>
+        <strong>{{ metrics.transaction_count }}</strong>
+    </article>
+    <article class="card metric-card">
+        <span>Items Sold</span>
+        <strong>{{ metrics.items_sold }}</strong>
+    </article>
+</section>
+
+<section class="card">
+    <div class="section-title-row">
+        <h3>Low Stock Alerts</h3>
+        <a href="{% url 'low_stock' %}">View all</a>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Barcode</th>
+                <th>Stock</th>
+                <th>Reorder</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in low_stock_products %}
+            <tr>
+                <td>{{ product.name }}</td>
+                <td>{{ product.barcode }}</td>
+                <td>{{ product.stock_quantity }}</td>
+                <td>{{ product.reorder_level }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">No low-stock items.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

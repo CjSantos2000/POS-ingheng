@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Receipt {{ transaction.receipt_number }}{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div>
+        <p class="eyebrow">Receipt</p>
+        <h2>{{ transaction.receipt_number }}</h2>
+    </div>
+    <a href="?format=pdf" class="button-link">PDF</a>
+</section>
+
+<section class="card receipt-card">
+    <p><strong>Date:</strong> {{ transaction.created_at }}</p>
+    <p><strong>Cashier:</strong> {{ transaction.cashier.username }}</p>
+    {% if transaction.customer %}
+    <p><strong>Customer:</strong> {{ transaction.customer.name }}</p>
+    {% endif %}
+    <table>
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Qty</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in transaction.items.all %}
+            <tr>
+                <td>{{ item.product.name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>${{ item.line_total }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="totals-box">
+        <div><span>Subtotal</span><strong>${{ transaction.subtotal }}</strong></div>
+        <div><span>Tax</span><strong>${{ transaction.tax_amount }}</strong></div>
+        <div><span>Discount</span><strong>${{ transaction.discount_amount }}</strong></div>
+        <div class="grand-total"><span>Total</span><strong>${{ transaction.total_amount }}</strong></div>
+    </div>
+</section>
+{% endblock %}

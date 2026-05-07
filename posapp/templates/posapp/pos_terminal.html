@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Terminal | POS Ingheng{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div>
+        <p class="eyebrow">Cashier Workspace</p>
+        <h2>Rapid Checkout Terminal</h2>
+    </div>
+    <div class="terminal-actions">
+        <button id="toggle-camera" type="button" class="ghost-button">Camera Scan</button>
+        <button id="clear-cart" type="button" class="ghost-button">Clear Cart</button>
+    </div>
+</section>
+
+<section class="terminal-layout" data-csrf="{{ csrf_token }}">
+    <article class="card scanner-panel">
+        <label class="stack-form">
+            <span>Barcode Input</span>
+            <input id="barcode-input" type="text" placeholder="Scan barcode and press Enter" autocomplete="off" autofocus>
+        </label>
+        <div id="scan-feedback" class="scan-feedback">Ready for scan</div>
+        <div id="camera-panel" class="camera-panel hidden">
+            <video id="camera-preview" playsinline></video>
+            <p>Uses browser barcode detection when available.</p>
+        </div>
+    </article>
+
+    <article class="card cart-panel">
+        <div class="section-title-row">
+            <h3>Current Cart</h3>
+            <span id="cart-count">{{ cart_items|length }} item(s)</span>
+        </div>
+        <div class="cart-table-wrap">
+            <table id="cart-table">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Qty</th>
+                        <th>Price</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart_items %}
+                    <tr data-product-id="{{ item.product_id }}">
+                        <td>{{ item.name }}<br><small>{{ item.barcode }}</small></td>
+                        <td><input type="number" min="0" value="{{ item.quantity }}" class="qty-input"></td>
+                        <td>${{ item.unit_price }}</td>
+                        <td>${{ item.subtotal }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr class="empty-cart-row"><td colspan="4">No scanned items yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </article>
+
+    <article class="card total-panel">
+        <h3>Finalize Sale</h3>
+        <form id="checkout-form" class="stack-form">
+            {% csrf_token %}
+            {{ checkout_form.as_p }}
+            <div class="totals-box">
+                <div><span>Subtotal</span><strong id="subtotal">${{ totals.subtotal }}</strong></div>
+                <div><span>Tax</span><strong id="tax">${{ totals.tax }}</strong></div>
+                <div class="grand-total"><span>Total</span><strong id="total">${{ totals.total }}</strong></div>
+            </div>
+            <button type="submit">Checkout</button>
+        </form>
+    </article>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'posapp/js/terminal.js' %}"></script>
+{% endblock %}

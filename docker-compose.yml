@@ -1,0 +1,28 @@
+services:
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: pos_ingheng
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  web:
+    build: .
+    restart: unless-stopped
+    command: sh -c "python manage.py migrate && python manage.py seed_pos_data && gunicorn config.wsgi:application --bind 0.0.0.0:8000"
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    env_file:
+      - .env
+
+volumes:
+  mysql_data:

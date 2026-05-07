@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Login | POS Ingheng{% endblock %}
+
+{% block content %}
+<section class="auth-panel">
+    <div class="card auth-card">
+        <div>
+            <p class="eyebrow">School Supply POS</p>
+            <h2>Cashier Login</h2>
+            <p>Barcode-focused checkout for fast in-store sales.</p>
+        </div>
+        <form method="post" class="stack-form">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            <label>
+                <span>Username</span>
+                {{ form.username }}
+            </label>
+            <label>
+                <span>Password</span>
+                {{ form.password }}
+            </label>
+            <button type="submit">Sign in</button>
+        </form>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Customers | POS Ingheng{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div>
+        <p class="eyebrow">Optional CRM</p>
+        <h2>Customers</h2>
+    </div>
+</section>
+
+<section class="split-layout">
+    <article class="card form-card">
+        <h3>Add Customer</h3>
+        <form method="post" class="stack-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Save Customer</button>
+        </form>
+    </article>
+    <article class="card">
+        <h3>Customer List</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for customer in customers %}
+                <tr>
+                    <td>{{ customer.name }}</td>
+                    <td>{{ customer.phone }}</td>
+                    <td>{{ customer.email }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3">No customers yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </article>
+</section>
+{% endblock %}
