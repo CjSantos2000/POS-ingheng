@@ -20,7 +20,7 @@
 <section class="metrics-grid">
     <article class="card metric-card">
         <span>Gross Sales</span>
-        <strong>${{ metrics.gross_sales }}</strong>
+        <strong>₱{{ metrics.gross_sales }}</strong>
     </article>
     <article class="card metric-card">
         <span>Transactions</span>
@@ -47,7 +47,7 @@
             <tr>
                 <td>{{ item.product__name }}</td>
                 <td>{{ item.quantity_sold }}</td>
-                <td>${{ item.revenue }}</td>
+                <td>₱{{ item.revenue }}</td>
             </tr>
             {% empty %}
             <tr>

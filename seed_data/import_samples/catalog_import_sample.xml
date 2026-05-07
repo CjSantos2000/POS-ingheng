@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+ <Worksheet ss:Name="CatalogImportSample">
+  <Table>
+   <Row>
+    <Cell><Data ss:Type="String">sku</Data></Cell>
+    <Cell><Data ss:Type="String">barcode</Data></Cell>
+    <Cell><Data ss:Type="String">name</Data></Cell>
+    <Cell><Data ss:Type="String">category</Data></Cell>
+    <Cell><Data ss:Type="String">description</Data></Cell>
+    <Cell><Data ss:Type="String">cost_price</Data></Cell>
+    <Cell><Data ss:Type="String">selling_price</Data></Cell>
+    <Cell><Data ss:Type="String">stock_quantity</Data></Cell>
+    <Cell><Data ss:Type="String">reorder_level</Data></Cell>
+    <Cell><Data ss:Type="String">is_active</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">NOTE0001</Data></Cell>
+    <Cell><Data ss:Type="String">2700000000001</Data></Cell>
+    <Cell><Data ss:Type="String">Campus Notebook A5</Data></Cell>
+    <Cell><Data ss:Type="String">notebook</Data></Cell>
+    <Cell><Data ss:Type="String">Best-selling lined notebook</Data></Cell>
+    <Cell><Data ss:Type="String">25.50</Data></Cell>
+    <Cell><Data ss:Type="String">35.00</Data></Cell>
+    <Cell><Data ss:Type="String">120</Data></Cell>
+    <Cell><Data ss:Type="String">20</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">PEN0002</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">Gel Pen Black 0.5</Data></Cell>
+    <Cell><Data ss:Type="String">Pens &amp; Pencils</Data></Cell>
+    <Cell><Data ss:Type="String">Barcode left blank so generation can be tested</Data></Cell>
+    <Cell><Data ss:Type="String">8.00</Data></Cell>
+    <Cell><Data ss:Type="String">12.00</Data></Cell>
+    <Cell><Data ss:Type="String">80</Data></Cell>
+    <Cell><Data ss:Type="String">15</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">PAPER003</Data></Cell>
+    <Cell><Data ss:Type="String">2700000000003</Data></Cell>
+    <Cell><Data ss:Type="String">Bond Paper Short</Data></Cell>
+    <Cell><Data ss:Type="String">paper</Data></Cell>
+    <Cell><Data ss:Type="String">500 sheets ream</Data></Cell>
+    <Cell><Data ss:Type="String">180.00</Data></Cell>
+    <Cell><Data ss:Type="String">215.00</Data></Cell>
+    <Cell><Data ss:Type="String">40</Data></Cell>
+    <Cell><Data ss:Type="String">8</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">SNACK004</Data></Cell>
+    <Cell><Data ss:Type="String">2700000000004</Data></Cell>
+    <Cell><Data ss:Type="String">Chocolate Wafer</Data></Cell>
+    <Cell><Data ss:Type="String">snack</Data></Cell>
+    <Cell><Data ss:Type="String">Front counter impulse item</Data></Cell>
+    <Cell><Data ss:Type="String">9.50</Data></Cell>
+    <Cell><Data ss:Type="String">12.00</Data></Cell>
+    <Cell><Data ss:Type="String">55</Data></Cell>
+    <Cell><Data ss:Type="String">10</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+   </Row>
+  </Table>
+ </Worksheet>
+</Workbook>

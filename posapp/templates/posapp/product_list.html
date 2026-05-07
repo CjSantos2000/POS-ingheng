@@ -10,7 +10,10 @@
     </div>
     <div class="terminal-actions">
         <a href="{% url 'product_import' %}" class="ghost-button">Import</a>
+        <a href="{% url 'stock_import' %}" class="ghost-button">Stock In</a>
         <a href="{% url 'product_export' %}" class="ghost-button">Export CSV</a>
+        <a href="{% url 'stock_levels_export' %}" class="ghost-button">Export Stock</a>
+        <a href="{% url 'product_barcodes_print' %}" class="ghost-button" target="_blank">Print All Barcodes</a>
         <a href="{% url 'product_create' %}" class="button-link">Add Product</a>
     </div>
 </section>
@@ -20,11 +23,18 @@
         <input type="search" name="q" value="{{ query }}" placeholder="Search name, barcode, or SKU">
         <button type="submit">Search</button>
     </form>
-    <table>
+    <form method="get" action="{% url 'product_barcodes_print' %}" target="_blank" class="stack-form">
+        <div class="search-row">
+            <input type="number" min="1" max="50" name="label_qty" value="1" placeholder="Labels each">
+            <button type="submit">Print Selected Barcodes</button>
+        </div>
+        <table>
         <thead>
             <tr>
+                <th>Select</th>
                 <th>Name</th>
                 <th>Barcode</th>
+                <th>Source</th>
                 <th>Price</th>
                 <th>Stock</th>
                 <th></th>
@@ -33,18 +43,24 @@
         <tbody>
             {% for product in products %}
             <tr>
+                <td><input type="checkbox" name="product_id" value="{{ product.id }}"></td>
                 <td>{{ product.name }}</td>
                 <td>{{ product.barcode }}</td>
-                <td>${{ product.selling_price }}</td>
+                <td>{{ product.get_barcode_source_display }}</td>
+                <td>₱{{ product.selling_price }}</td>
                 <td>{{ product.stock_quantity }}</td>
-                <td><a href="{% url 'product_edit' product.id %}">Edit</a></td>
+                <td>
+                    <a href="{% url 'product_edit' product.id %}">Edit</a>
+                    <a href="{% url 'product_barcode_print' product.id %}" target="_blank">Print</a>
+                </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="5">No products found.</td>
+                <td colspan="7">No products found.</td>
             </tr>
             {% endfor %}
         </tbody>
-    </table>
+        </table>
+    </form>
 </section>
 {% endblock %}

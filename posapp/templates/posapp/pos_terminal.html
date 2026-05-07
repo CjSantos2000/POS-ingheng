@@ -48,8 +48,8 @@
                     <tr data-product-id="{{ item.product_id }}">
                         <td>{{ item.name }}<br><small>{{ item.barcode }}</small></td>
                         <td><input type="number" min="0" value="{{ item.quantity }}" class="qty-input"></td>
-                        <td>${{ item.unit_price }}</td>
-                        <td>${{ item.subtotal }}</td>
+                        <td>₱{{ item.unit_price }}</td>
+                        <td>₱{{ item.subtotal }}</td>
                     </tr>
                     {% empty %}
                     <tr class="empty-cart-row"><td colspan="4">No scanned items yet.</td></tr>
@@ -65,9 +65,9 @@
             {% csrf_token %}
             {{ checkout_form.as_p }}
             <div class="totals-box">
-                <div><span>Subtotal</span><strong id="subtotal">${{ totals.subtotal }}</strong></div>
-                <div><span>Tax</span><strong id="tax">${{ totals.tax }}</strong></div>
-                <div class="grand-total"><span>Total</span><strong id="total">${{ totals.total }}</strong></div>
+                <div><span>Subtotal</span><strong id="subtotal">₱{{ totals.subtotal }}</strong></div>
+                <div><span>Tax</span><strong id="tax">₱{{ totals.tax }}</strong></div>
+                <div class="grand-total"><span>Total</span><strong id="total">₱{{ totals.total }}</strong></div>
             </div>
             <button type="submit">Checkout</button>
         </form>

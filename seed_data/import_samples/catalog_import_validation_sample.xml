@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+ <Worksheet ss:Name="CatalogValidationSample">
+  <Table>
+   <Row>
+    <Cell><Data ss:Type="String">sku</Data></Cell>
+    <Cell><Data ss:Type="String">barcode</Data></Cell>
+    <Cell><Data ss:Type="String">name</Data></Cell>
+    <Cell><Data ss:Type="String">category</Data></Cell>
+    <Cell><Data ss:Type="String">description</Data></Cell>
+    <Cell><Data ss:Type="String">cost_price</Data></Cell>
+    <Cell><Data ss:Type="String">selling_price</Data></Cell>
+    <Cell><Data ss:Type="String">stock_quantity</Data></Cell>
+    <Cell><Data ss:Type="String">reorder_level</Data></Cell>
+    <Cell><Data ss:Type="String">is_active</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">VALID001</Data></Cell>
+    <Cell><Data ss:Type="String">2700000000101</Data></Cell>
+    <Cell><Data ss:Type="String">Sketch Pad A4</Data></Cell>
+    <Cell><Data ss:Type="String">paper</Data></Cell>
+    <Cell><Data ss:Type="String">Valid row to confirm mixed import behavior</Data></Cell>
+    <Cell><Data ss:Type="String">45.00</Data></Cell>
+    <Cell><Data ss:Type="String">60.00</Data></Cell>
+    <Cell><Data ss:Type="String">30</Data></Cell>
+    <Cell><Data ss:Type="String">5</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">VALID001</Data></Cell>
+    <Cell><Data ss:Type="String">2700000000102</Data></Cell>
+    <Cell><Data ss:Type="String">Duplicate SKU Example</Data></Cell>
+    <Cell><Data ss:Type="String">supplies</Data></Cell>
+    <Cell><Data ss:Type="String">Should fail because SKU duplicates previous row</Data></Cell>
+    <Cell><Data ss:Type="String">10.00</Data></Cell>
+    <Cell><Data ss:Type="String">15.00</Data></Cell>
+    <Cell><Data ss:Type="String">12</Data></Cell>
+    <Cell><Data ss:Type="String">5</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">NEGSTOCK1</Data></Cell>
+    <Cell><Data ss:Type="String">2700000000103</Data></Cell>
+    <Cell><Data ss:Type="String">Negative Stock Example</Data></Cell>
+    <Cell><Data ss:Type="String">other</Data></Cell>
+    <Cell><Data ss:Type="String">Should fail because stock quantity is negative</Data></Cell>
+    <Cell><Data ss:Type="String">10.00</Data></Cell>
+    <Cell><Data ss:Type="String">18.00</Data></Cell>
+    <Cell><Data ss:Type="String">-5</Data></Cell>
+    <Cell><Data ss:Type="String">3</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">DUPBC001</Data></Cell>
+    <Cell><Data ss:Type="String">2700000000101</Data></Cell>
+    <Cell><Data ss:Type="String">Duplicate Barcode Example</Data></Cell>
+    <Cell><Data ss:Type="String">notebook</Data></Cell>
+    <Cell><Data ss:Type="String">Should fail because barcode duplicates first row</Data></Cell>
+    <Cell><Data ss:Type="String">20.00</Data></Cell>
+    <Cell><Data ss:Type="String">28.00</Data></Cell>
+    <Cell><Data ss:Type="String">15</Data></Cell>
+    <Cell><Data ss:Type="String">5</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">BADPRICE1</Data></Cell>
+    <Cell><Data ss:Type="String">2700000000104</Data></Cell>
+    <Cell><Data ss:Type="String">Negative Price Example</Data></Cell>
+    <Cell><Data ss:Type="String">other</Data></Cell>
+    <Cell><Data ss:Type="String">Should fail because cost price is negative</Data></Cell>
+    <Cell><Data ss:Type="String">-1.00</Data></Cell>
+    <Cell><Data ss:Type="String">20.00</Data></Cell>
+    <Cell><Data ss:Type="String">10</Data></Cell>
+    <Cell><Data ss:Type="String">5</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">GENBC002</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">Generated Barcode Example</Data></Cell>
+    <Cell><Data ss:Type="String">School Supplies</Data></Cell>
+    <Cell><Data ss:Type="String">Valid row with blank barcode to test auto-generation</Data></Cell>
+    <Cell><Data ss:Type="String">5.00</Data></Cell>
+    <Cell><Data ss:Type="String">9.00</Data></Cell>
+    <Cell><Data ss:Type="String">25</Data></Cell>
+    <Cell><Data ss:Type="String">5</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+   </Row>
+  </Table>
+ </Worksheet>
+</Workbook>

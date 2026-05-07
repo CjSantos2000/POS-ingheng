@@ -13,16 +13,21 @@ from rest_framework import generics, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .forms import CheckoutForm, CustomerForm, ImportProductsForm, ProductForm, ReportFilterForm
+from .forms import CheckoutForm, CustomerForm, ImportProductsForm, ProductForm, ReportFilterForm, StockImportForm
 from .models import Customer, Product, SaleTransaction
 from .serializers import ProductSerializer
 from .services import (
+    build_product_barcodes_pdf,
     build_receipt_pdf,
+    build_thermal_receipt_pdf,
     cart_snapshot,
     clear_cart,
     export_products_csv,
+    export_stock_levels_csv,
+    export_stock_template_csv,
     finalize_sale,
     import_products,
+    import_stock_rows,
     parse_product_upload,
     report_metrics,
     scan_product_into_cart,
@@ -63,6 +68,8 @@ def scan_barcode(request):
         item, totals = scan_product_into_cart(user_id=request.user.id, barcode=barcode)
     except Product.DoesNotExist:
         return JsonResponse({"error": f"Barcode {barcode} was not found."}, status=404)
+    except ValueError as e:
+        return JsonResponse({"error": str(e)}, status=400)
     return JsonResponse({"item": item, "totals": totals.__dict__})
 
 
@@ -118,7 +125,7 @@ def product_create(request):
         form.save()
         messages.success(request, "Product saved.")
         return redirect("product_list")
-    return render(request, "posapp/product_form.html", {"form": form, "title": "Add Product"})
+    return render(request, "posapp/product_form.html", {"form": form, "title": "Add Product", "product": None})
 
 
 @login_required
@@ -130,7 +137,7 @@ def product_edit(request, pk: int):
         form.save()
         messages.success(request, "Product updated.")
         return redirect("product_list")
-    return render(request, "posapp/product_form.html", {"form": form, "title": f"Edit {product.name}"})
+    return render(request, "posapp/product_form.html", {"form": form, "title": f"Edit {product.name}", "product": product})
 
 
 @login_required
@@ -139,16 +146,75 @@ def product_import_view(request):
     form = ImportProductsForm(request.POST or None, request.FILES or None)
     if request.method == "POST" and form.is_valid():
         rows = parse_product_upload(form.cleaned_data["file"])
-        imported = import_products(rows)
-        messages.success(request, f"Imported {imported} products.")
+        summary = import_products(rows, generate_missing_barcodes=form.cleaned_data["generate_missing_barcodes"])
+        messages.success(
+            request,
+            f"Catalog import finished: {summary.created} created, {summary.updated} updated, {summary.generated_barcodes} barcodes generated.",
+        )
+        if summary.failed_rows:
+            messages.warning(request, f"Skipped {summary.failed_rows} row(s). First issue: {summary.errors[0]}")
         return redirect("product_list")
     return render(request, "posapp/product_import.html", {"form": form})
+
+
+@login_required
+def stock_import_view(request):
+    ensure_admin(request)
+    form = StockImportForm(request.POST or None, request.FILES or None)
+    if request.method == "POST" and form.is_valid():
+        rows = parse_product_upload(form.cleaned_data["file"])
+        summary = import_stock_rows(rows, reference=form.cleaned_data["reference"])
+        messages.success(request, f"Stock-in finished: {summary.updated} product rows updated and {summary.stock_adjustments} unit(s) added.")
+        if summary.failed_rows:
+            messages.warning(request, f"Skipped {summary.failed_rows} row(s). First issue: {summary.errors[0]}")
+        return redirect("product_list")
+    return render(request, "posapp/stock_import.html", {"form": form})
 
 
 @login_required
 def product_export_view(request):
     ensure_admin(request)
     return export_products_csv()
+
+
+@login_required
+def stock_template_export_view(request):
+    ensure_admin(request)
+    return export_stock_template_csv()
+
+
+@login_required
+def stock_levels_export_view(request):
+    ensure_admin(request)
+    return export_stock_levels_csv()
+
+
+@login_required
+def product_barcodes_print_view(request):
+    ensure_admin(request)
+    selected_ids = [value for value in request.GET.getlist("product_id") if value.isdigit()]
+    try:
+        labels_per_product = max(1, min(int(request.GET.get("label_qty", 1) or 1), 50))
+    except ValueError:
+        labels_per_product = 1
+    products = Product.objects.filter(is_active=True).order_by("name")
+    if selected_ids:
+        products = products.filter(id__in=selected_ids)
+    if not products.exists():
+        messages.warning(request, "Select at least one product before printing barcodes.")
+        return redirect("product_list")
+    return build_product_barcodes_pdf(products, labels_per_product=labels_per_product)
+
+
+@login_required
+def product_barcode_print_view(request, pk: int):
+    ensure_admin(request)
+    product = get_object_or_404(Product, pk=pk)
+    try:
+        labels_per_product = max(1, min(int(request.GET.get("label_qty", 1) or 1), 50))
+    except ValueError:
+        labels_per_product = 1
+    return build_product_barcodes_pdf([product], labels_per_product=labels_per_product)
 
 
 @login_required
@@ -160,8 +226,13 @@ def transaction_list(request):
 @login_required
 def receipt_view(request, pk: int):
     transaction_obj = get_object_or_404(SaleTransaction.objects.select_related("cashier", "customer").prefetch_related("items__product"), pk=pk)
-    if request.GET.get("format") == "pdf":
+    output_format = request.GET.get("format")
+    if output_format == "pdf":
         return build_receipt_pdf(transaction_obj)
+    if output_format == "thermal-pdf":
+        return build_thermal_receipt_pdf(transaction_obj)
+    if output_format == "thermal":
+        return render(request, "posapp/receipt_thermal.html", {"transaction": transaction_obj})
     return render(request, "posapp/receipt.html", {"transaction": transaction_obj})
 
 
@@ -207,11 +278,17 @@ class ProductListAPI(generics.ListAPIView):
 
     def get_queryset(self):
         query = self.request.GET.get("q", "").strip()
+        barcode = self.request.GET.get("barcode", "").strip()
+        exclude_id = self.request.GET.get("exclude_id", "").strip()
         queryset = Product.objects.filter(is_active=True).only(
-            "id", "sku", "barcode", "name", "category", "selling_price", "stock_quantity", "reorder_level", "is_active"
+            "id", "sku", "barcode", "barcode_source", "name", "category", "selling_price", "stock_quantity", "reorder_level", "is_active"
         )
+        if barcode:
+            queryset = queryset.filter(barcode=barcode)
         if query:
             queryset = queryset.filter(Q(name__icontains=query) | Q(barcode__icontains=query) | Q(sku__icontains=query))
+        if exclude_id.isdigit():
+            queryset = queryset.exclude(pk=int(exclude_id))
         return queryset[:50]
 
 
@@ -232,4 +309,6 @@ class ScanProductAPI(APIView):
             item, totals = scan_product_into_cart(user_id=request.user.id, barcode=barcode)
         except Product.DoesNotExist:
             return Response({"error": "Product not found"}, status=404)
+        except ValueError as exc:
+            return Response({"error": str(exc)}, status=400)
         return Response({"item": item, "totals": totals.__dict__})

@@ -8,6 +8,10 @@
         <p class="eyebrow">Inventory</p>
         <h2>Import Products</h2>
     </div>
+    <div class="terminal-actions">
+        <a href="{% url 'stock_template_export' %}" class="ghost-button">Stock-In Template</a>
+        <a href="{% url 'product_export' %}" class="ghost-button">Catalog Export</a>
+    </div>
 </section>
 
 <section class="card form-card">
@@ -16,5 +20,6 @@
         {{ form.as_p }}
         <button type="submit">Import</button>
     </form>
+    <p>Catalog import can create new products, update existing products by barcode or SKU, and generate barcodes for rows that do not supply one.</p>
 </section>
 {% endblock %}

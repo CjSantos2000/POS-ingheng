@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Stock In Import | POS Ingheng{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div>
+        <p class="eyebrow">Inventory</p>
+        <h2>Stock In Import</h2>
+    </div>
+    <div class="terminal-actions">
+        <a href="{% url 'stock_template_export' %}" class="ghost-button">Download Template</a>
+        <a href="{% url 'stock_levels_export' %}" class="ghost-button">Export Stock Levels</a>
+    </div>
+</section>
+
+<section class="card form-card">
+    <form method="post" enctype="multipart/form-data" class="stack-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Import Stock In</button>
+    </form>
+    <p>Use either barcode or SKU with a positive stock_in_quantity. This flow only adds stock and records accurate stock movement references.</p>
+</section>
+{% endblock %}

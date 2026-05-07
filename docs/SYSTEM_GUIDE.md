@@ -2,7 +2,7 @@
 
 ## 1. System Overview
 
-POS Ingheng is a barcode-first point-of-sale system designed for a school supply and general merchandise store. The system is optimized for fast cashier operation, especially when using barcode scanners for rapid item entry during checkout.
+POS Ingheng is a barcode-first point-of-sale system designed for a school supply and general merchandise store. The system is optimized for fast cashier operation, especially when using barcode scanners for rapid item entry during checkout. All prices and transactions are handled in Philippine Peso (PHP / ₱).
 
 Primary goals:
 

@@ -27,7 +27,7 @@
                 <td>{{ transaction.receipt_number }}</td>
                 <td>{{ transaction.created_at }}</td>
                 <td>{{ transaction.cashier.username }}</td>
-                <td>${{ transaction.total_amount }}</td>
+                <td>₱{{ transaction.total_amount }}</td>
                 <td><a href="{% url 'receipt_view' transaction.id %}">Receipt</a></td>
             </tr>
             {% empty %}

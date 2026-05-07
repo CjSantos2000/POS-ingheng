@@ -15,6 +15,8 @@ const cameraPreview = document.getElementById("camera-preview");
 let videoStream = null;
 let detector = null;
 let scanLoopHandle = null;
+let isProcessingScan = false;
+let barcodeTimeout = null;
 
 function setFeedback(message, isError = false) {
     feedback.textContent = message;
@@ -23,7 +25,7 @@ function setFeedback(message, isError = false) {
 }
 
 function currency(value) {
-    return `$${Number(value).toFixed(2)}`;
+    return `₱${Number(value).toFixed(2)}`;
 }
 
 function renderCart(items, totals) {
@@ -67,10 +69,59 @@ barcodeInput?.addEventListener("keydown", async (event) => {
         return;
     }
     event.preventDefault();
+    
+    // Clear timeout if user presses Enter manually
+    if (barcodeTimeout) {
+        clearTimeout(barcodeTimeout);
+        barcodeTimeout = null;
+    }
+    
+    // Prevent double-scan in quick succession
+    if (isProcessingScan) {
+        return;
+    }
+    
     const barcode = barcodeInput.value.trim();
     if (!barcode) {
         return;
     }
+    
+    await submitBarcode(barcode);
+});
+
+// Auto-submit barcode when input is stable for 200ms (scanner detection)
+barcodeInput?.addEventListener("input", (event) => {
+    // Clear existing timeout
+    if (barcodeTimeout) {
+        clearTimeout(barcodeTimeout);
+    }
+    
+    // Set new timeout - submit after 200ms of no input
+    barcodeTimeout = setTimeout(async () => {
+        const barcode = barcodeInput.value.trim();
+        
+        // Only auto-submit if:
+        // 1. Input is not empty
+        // 2. Not already processing
+        // 3. Input looks like a barcode (at least 3 characters)
+        if (barcode.length >= 3 && !isProcessingScan) {
+            await submitBarcode(barcode);
+        }
+        
+        barcodeTimeout = null;
+    }, 200);
+});
+
+async function submitBarcode(barcode) {
+    // Prevent double-scan in quick succession
+    if (isProcessingScan) {
+        return;
+    }
+    
+    isProcessingScan = true;
+    barcodeInput.disabled = true;
+    setFeedback("Scanning...");
+    
     try {
         const data = await postForm("/terminal/scan/", { barcode });
         const row = cartBody.querySelector(`[data-product-id="${data.item.product_id}"]`);
@@ -81,8 +132,8 @@ barcodeInput?.addEventListener("keydown", async (event) => {
                 name: tr.cells[0].childNodes[0].textContent,
                 barcode: tr.cells[0].querySelector("small")?.textContent || "",
                 quantity: Number(tr.querySelector(".qty-input")?.value || 0),
-                unit_price: tr.cells[2].textContent.replace("$", ""),
-                subtotal: tr.cells[3].textContent.replace("$", ""),
+                unit_price: tr.cells[2].textContent.replace("₱", ""),
+                subtotal: tr.cells[3].textContent.replace("₱", ""),
             }));
             const index = items.findIndex((item) => item.product_id === data.item.product_id);
             items[index] = data.item;
@@ -92,19 +143,41 @@ barcodeInput?.addEventListener("keydown", async (event) => {
                 name: tr.cells[0].childNodes[0].textContent,
                 barcode: tr.cells[0].querySelector("small")?.textContent || "",
                 quantity: Number(tr.querySelector(".qty-input")?.value || 0),
-                unit_price: tr.cells[2].textContent.replace("$", ""),
-                subtotal: tr.cells[3].textContent.replace("$", ""),
+                unit_price: tr.cells[2].textContent.replace("₱", ""),
+                subtotal: tr.cells[3].textContent.replace("₱", ""),
             }))];
         }
         renderCart(items, data.totals);
         barcodeInput.value = "";
-        setFeedback(`Scanned ${data.item.name}`);
-        barcodeInput.focus();
+        
+        // Stock check - show low stock warning (item was successfully added)
+        const stock = Number(data.item.stock_quantity || 0);
+        const remaining = stock - Number(data.item.quantity || 1);
+        
+        let feedbackMsg = `✓ ${data.item.name}`;
+        let isWarning = false;
+        
+        if (remaining === 0) {
+            feedbackMsg += " [Last item - now out of stock]";
+            isWarning = true;
+        } else if (remaining < 5) {
+            feedbackMsg += ` [Only ${remaining} left in stock]`;
+            isWarning = true;
+        }
+        
+        setFeedback(feedbackMsg, isWarning);
     } catch (error) {
         setFeedback(error.message, true);
         barcodeInput.select();
+    } finally {
+        isProcessingScan = false;
+        barcodeInput.disabled = false;
+        // Restore focus AFTER disabled = false and DOM settle
+        requestAnimationFrame(() => {
+            barcodeInput.focus();
+        });
     }
-});
+}
 
 cartBody?.addEventListener("change", async (event) => {
     const target = event.target;
@@ -121,6 +194,9 @@ cartBody?.addEventListener("change", async (event) => {
         setFeedback("Cart updated.");
     } catch (error) {
         setFeedback(error.message, true);
+    } finally {
+        // Refocus barcode input after quantity change
+        setTimeout(() => barcodeInput.focus(), 50);
     }
 });
 
@@ -145,6 +221,59 @@ clearCartButton?.addEventListener("click", async () => {
         setFeedback(error.message, true);
     }
 });
+
+// STICKY FOCUS: Keep barcode input as primary target for scanner
+// Refocus barcode input when user clicks away or blurs
+barcodeInput?.addEventListener("blur", (event) => {
+    // Don't refocus if user is submitting checkout
+    if (event.relatedTarget?.closest("form#checkout-form")) {
+        return;
+    }
+    // Refocus barcode input for next scan
+    setTimeout(() => barcodeInput.focus(), 10);
+});
+
+// Visual indicator: Highlight barcode input when focused
+barcodeInput?.addEventListener("focus", () => {
+    barcodeInput.style.boxShadow = "0 0 0 3px rgba(34, 197, 94, 0.2)";
+    barcodeInput.style.borderColor = "#22c55e";
+});
+
+barcodeInput?.addEventListener("blur", () => {
+    barcodeInput.style.boxShadow = "";
+    barcodeInput.style.borderColor = "";
+});
+
+// Tab key handling: Keep focus on barcode input during checkout
+document.addEventListener("keydown", (event) => {
+    // If Tab is pressed while barcode input is focused
+    if (event.key === "Tab" && document.activeElement === barcodeInput) {
+        // Check if user is trying to exit to checkout form
+        if (checkoutForm && event.shiftKey === false) {
+            // Allow Tab to move to checkout form if it's visible
+            const checkoutButton = checkoutForm?.querySelector("button[type='submit']");
+            if (checkoutButton) {
+                // Let Tab proceed naturally to checkout
+                return;
+            }
+        } else {
+            // Shift+Tab should keep focus on barcode input
+            event.preventDefault();
+            barcodeInput.focus();
+        }
+    }
+});
+
+// Intercept clicks on quantity inputs to allow editing, then refocus barcode
+document.addEventListener("click", (event) => {
+    if (event.target.classList.contains("qty-input")) {
+        // Allow quantity input to be edited
+        // Focus will be restored after change event (see cartBody change listener)
+    } else if (!event.target.closest("form#checkout-form") && !event.target.closest("button")) {
+        // Click elsewhere? Refocus barcode input
+        setTimeout(() => barcodeInput.focus(), 10);
+    }
+}, true); // Use capture phase to intercept early
 
 async function stopCamera() {
     if (scanLoopHandle) {
@@ -195,4 +324,8 @@ cameraButton?.addEventListener("click", async () => {
     }
 });
 
-barcodeInput?.focus();
+// Initialize: Focus barcode input and display ready state
+window.addEventListener("load", () => {
+    barcodeInput?.focus();
+    setFeedback("Ready to scan");
+});

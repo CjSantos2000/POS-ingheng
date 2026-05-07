@@ -1,6 +1,6 @@
 # POS Ingheng
 
-Intermediate POS system for a school supply and general merchandise store, built with Django and MySQL. The implementation prioritizes barcode scan speed, rapid transaction flow, and a keyboard-first cashier UI.
+Intermediate POS system for a school supply and general merchandise store, built with Django and MySQL. The implementation prioritizes barcode scan speed, rapid transaction flow, and a keyboard-first cashier UI. All pricing is in Philippine Peso (PHP / ₱).
 
 ## Highlights
 

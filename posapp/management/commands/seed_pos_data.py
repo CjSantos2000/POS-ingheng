@@ -23,8 +23,15 @@ class Command(BaseCommand):
         with seed_file.open("r", encoding="utf-8-sig") as handle:
             rows = list(csv.DictReader(handle))
 
-        imported = import_products(rows)
-        self.stdout.write(self.style.SUCCESS(f"Imported {imported} products."))
+        summary = import_products(rows)
+        self.stdout.write(
+            self.style.SUCCESS(
+                f"Catalog import finished: {summary.created} created, {summary.updated} updated, "
+                f"{summary.generated_barcodes} barcodes generated, {summary.failed_rows} failed."
+            )
+        )
+        if summary.errors:
+            self.stdout.write(self.style.WARNING(f"First import warning: {summary.errors[0]}"))
 
         user_model = get_user_model()
         admin_user, _ = user_model.objects.get_or_create(

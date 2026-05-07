@@ -23,10 +23,23 @@ class User(AbstractUser):
 
 
 class Product(models.Model):
+    class Category(models.TextChoices):
+        NOTEBOOK = "notebook", "Notebooks"
+        PEN = "pen", "Pens & Pencils"
+        PAPER = "paper", "Paper Products"
+        SNACK = "snack", "Snacks & Beverages"
+        SUPPLIES = "supplies", "School Supplies"
+        OTHER = "other", "Other"
+
+    class BarcodeSource(models.TextChoices):
+        MANUAL = "manual", "Manual"
+        GENERATED = "generated", "Generated"
+
     sku = models.CharField(max_length=40, unique=True)
     barcode = models.CharField(max_length=64, unique=True, db_index=True)
+    barcode_source = models.CharField(max_length=20, choices=BarcodeSource.choices, default=BarcodeSource.MANUAL)
     name = models.CharField(max_length=255, db_index=True)
-    category = models.CharField(max_length=120, blank=True)
+    category = models.CharField(max_length=120, choices=Category.choices, blank=True, default=Category.OTHER)
     description = models.TextField(blank=True)
     cost_price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(Decimal("0.00"))])
     selling_price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(Decimal("0.00"))])

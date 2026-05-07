@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+ <Worksheet ss:Name="StockInSample">
+  <Table>
+   <Row>
+    <Cell><Data ss:Type="String">barcode</Data></Cell>
+    <Cell><Data ss:Type="String">sku</Data></Cell>
+    <Cell><Data ss:Type="String">stock_in_quantity</Data></Cell>
+    <Cell><Data ss:Type="String">reference</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">2700000000001</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">25</Data></Cell>
+    <Cell><Data ss:Type="String">delivery-may-001</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">PEN0002</Data></Cell>
+    <Cell><Data ss:Type="String">40</Data></Cell>
+    <Cell><Data ss:Type="String">delivery-may-001</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">2700000000003</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">10</Data></Cell>
+    <Cell><Data ss:Type="String">delivery-may-002</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">SNACK004</Data></Cell>
+    <Cell><Data ss:Type="String">5</Data></Cell>
+    <Cell><Data ss:Type="String">counter-restock</Data></Cell>
+   </Row>
+  </Table>
+ </Worksheet>
+</Workbook>
