@@ -1,21 +1,172 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thermal Receipt {{ transaction.receipt_number }}</title>
+    <style>
+        :root {
+            --paper-width: {{ paper_width_mm }}mm;
+            --receipt-width: calc(var(--paper-width) - 2mm);
+        }
 
-{% block title %}Thermal Receipt {{ transaction.receipt_number }}{% endblock %}
+        * {
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
 
-{% block content %}
-<section class="page-header">
-    <div>
-        <p class="eyebrow">Receipt</p>
-        <h2>Thermal {{ transaction.receipt_number }}</h2>
-    </div>
-    <div class="terminal-actions">
-        <a href="{% url 'receipt_view' transaction.id %}" class="ghost-button">Standard View</a>
-        <a href="?format=thermal-pdf" class="ghost-button">Thermal PDF</a>
-        <button type="button" class="button-link" onclick="window.print()">Print</button>
-    </div>
-</section>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: var(--paper-width);
+            color: #000;
+            font-family: "Courier New", Courier, monospace;
+            background: #f0f0f0;
+        }
 
-<section class="card thermal-wrap">
+        .print-controls {
+            width: min(420px, 100vw - 20px);
+            margin: 10px auto;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid #d8d8d8;
+            background: #fff;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .print-controls a,
+        .print-controls button {
+            border: 1px solid #bbb;
+            border-radius: 10px;
+            padding: 8px 10px;
+            background: #fff;
+            color: #000;
+            text-decoration: none;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .print-note {
+            margin: 0;
+            font-size: 12px;
+            width: 100%;
+            color: #333;
+        }
+
+        .thermal-receipt {
+            width: var(--receipt-width);
+            margin: 0 auto;
+            padding: 2mm 1mm 4mm;
+            background: #fff;
+            font-size: 15px;
+            line-height: 1.45;
+            font-weight: 600;
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        .thermal-receipt h3 {
+            margin: 0;
+            font-size: 19px;
+            letter-spacing: 0.3px;
+        }
+
+        .thermal-receipt header p {
+            margin: 2px 0 0;
+            font-size: 15px;
+        }
+
+        .divider {
+            border-top: 1px solid #000;
+            margin: 8px 0;
+        }
+
+        .thermal-receipt p {
+            margin: 3px 0;
+            display: flex;
+            justify-content: space-between;
+            gap: 6px;
+        }
+
+        .thermal-receipt p span,
+        .thermal-receipt p strong {
+            display: block;
+        }
+
+        .head-row {
+            display: grid;
+            grid-template-columns: 1fr 12mm 14mm;
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .item-row {
+            display: grid;
+            grid-template-columns: 1fr 12mm 14mm;
+            gap: 3px;
+            margin: 3px 0;
+            font-size: 15px;
+        }
+
+        .item-row .qty,
+        .item-row .amt,
+        .head-row span:nth-child(2),
+        .head-row span:nth-child(3) {
+            text-align: right;
+        }
+
+        .item-row .name {
+            word-break: break-word;
+        }
+
+        .total {
+            font-weight: 700;
+            font-size: 17px;
+        }
+
+        .footer-note {
+            margin-top: 10px;
+            font-size: 13px;
+        }
+
+        @media print {
+            @page {
+                size: {{ paper_width_mm }}mm auto;
+                margin: 0;
+            }
+
+            html,
+            body {
+                background: #fff;
+            }
+
+            .print-controls {
+                display: none !important;
+            }
+
+            .thermal-receipt {
+                padding-top: 1mm;
+            }
+        }
+    </style>
+</head>
+<body>
+    <section class="print-controls">
+        <a href="{% url 'receipt_view' transaction.id %}">Standard View</a>
+        <a href="?format=thermal-pdf&paper={{ paper_width_mm }}">Thermal PDF</a>
+        <button type="button" onclick="window.print()">Print</button>
+        <p class="print-note">Tip: turn off browser "Headers and footers" for clean thermal output.</p>
+    </section>
+
     <article class="thermal-receipt" id="thermal-receipt">
         <header class="center">
             <h3>POS Enghing</h3>
@@ -39,7 +190,7 @@
             <span>Qty</span>
             <span>Amt</span>
         </div>
-        <div class="divider dotted"></div>
+        <div class="divider"></div>
 
         {% for item in transaction.items.all %}
         <div class="item-row">
@@ -68,131 +219,5 @@
             <p>THANK YOU. PLEASE COME AGAIN</p>
         </footer>
     </article>
-</section>
-
-<style>
-    .thermal-wrap {
-        display: flex;
-        justify-content: center;
-        background: #efefef;
-    }
-
-    .thermal-receipt {
-        width: 78mm;
-        background: #fff;
-        color: #111;
-        border: 1px solid #d9d9d9;
-        padding: 10px 10px 14px;
-        font-family: "Courier New", Courier, monospace;
-        font-size: 14px;
-        line-height: 1.45;
-    }
-
-    .center {
-        text-align: center;
-    }
-
-    .thermal-receipt h3 {
-        margin: 0;
-        font-size: 18px;
-        letter-spacing: 0.4px;
-    }
-
-    .thermal-receipt header p {
-        margin: 2px 0 0;
-        font-size: 14px;
-    }
-
-    .divider {
-        border-top: 1px solid #000;
-        margin: 10px 0;
-    }
-
-    .divider.dotted {
-        border-top-style: dotted;
-    }
-
-    .thermal-receipt p {
-        margin: 3px 0;
-        display: flex;
-        justify-content: space-between;
-        gap: 8px;
-    }
-
-    .head-row {
-        display: grid;
-        grid-template-columns: 1fr 42px 68px;
-        font-weight: 700;
-        font-size: 14px;
-    }
-
-    .item-row {
-        display: grid;
-        grid-template-columns: 1fr 42px 68px;
-        gap: 4px;
-        margin: 3px 0;
-        font-size: 14px;
-    }
-
-    .item-row .qty,
-    .item-row .amt,
-    .head-row span:nth-child(2),
-    .head-row span:nth-child(3) {
-        text-align: right;
-    }
-
-    .item-row .name {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .total {
-        font-weight: 700;
-        font-size: 17px;
-    }
-
-    .footer-note {
-        margin-top: 10px;
-        font-size: 13px;
-    }
-
-    @media print {
-        .page-header,
-        nav,
-        .sidebar,
-        .app-shell > aside {
-            display: none !important;
-        }
-
-        .thermal-wrap {
-            background: #fff;
-            padding: 0;
-            margin: 0;
-        }
-
-        .thermal-receipt {
-            border: none;
-            width: 76mm;
-            padding: 0;
-            margin: 0 auto;
-            font-size: 15px;
-            line-height: 1.5;
-        }
-
-        .thermal-receipt h3 {
-            font-size: 19px;
-        }
-
-        .thermal-receipt header p,
-        .head-row,
-        .item-row {
-            font-size: 15px;
-        }
-
-        .total {
-            font-size: 18px;
-        }
-    }
-</style>
-{% endblock %}
+</body>
+</html>

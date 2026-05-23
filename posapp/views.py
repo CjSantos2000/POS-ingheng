@@ -227,12 +227,14 @@ def transaction_list(request):
 def receipt_view(request, pk: int):
     transaction_obj = get_object_or_404(SaleTransaction.objects.select_related("cashier", "customer").prefetch_related("items__product"), pk=pk)
     output_format = request.GET.get("format")
+    paper_width = request.GET.get("paper", "58")
+    paper_width_mm = 80 if paper_width == "80" else 58
     if output_format == "pdf":
         return build_receipt_pdf(transaction_obj)
     if output_format == "thermal-pdf":
-        return build_thermal_receipt_pdf(transaction_obj)
+        return build_thermal_receipt_pdf(transaction_obj, paper_width_mm=paper_width_mm)
     if output_format == "thermal":
-        return render(request, "posapp/receipt_thermal.html", {"transaction": transaction_obj})
+        return render(request, "posapp/receipt_thermal.html", {"transaction": transaction_obj, "paper_width_mm": paper_width_mm})
     return render(request, "posapp/receipt.html", {"transaction": transaction_obj})
 
 

@@ -435,22 +435,25 @@ def build_receipt_pdf(transaction_obj: SaleTransaction) -> HttpResponse:
     return response
 
 
-def build_thermal_receipt_pdf(transaction_obj: SaleTransaction) -> HttpResponse:
+def build_thermal_receipt_pdf(transaction_obj: SaleTransaction, paper_width_mm: int = 58) -> HttpResponse:
     response = HttpResponse(content_type="application/pdf")
     response["Content-Disposition"] = f'inline; filename="{transaction_obj.receipt_number}-thermal.pdf"'
     currency = settings.POS_CURRENCY_SYMBOL
 
     items = list(transaction_obj.items.select_related("product"))
-    page_width = 80 * mm
-    row_height = 6.5 * mm
+    safe_width_mm = 80 if paper_width_mm == 80 else 58
+    page_width = safe_width_mm * mm
+    row_height = 6.0 * mm
     base_height = 75 * mm
     computed_height = base_height + (len(items) * row_height) + (12 * row_height)
     page_height = max(computed_height, 140 * mm)
 
     pdf = canvas.Canvas(response, pagesize=(page_width, page_height))
     y = page_height - 8 * mm
-    left = 4 * mm
-    right = page_width - 4 * mm
+    left = 2 * mm
+    right = page_width - 2 * mm
+    qty_column = right - 13 * mm
+    name_limit = 22 if safe_width_mm == 80 else 15
 
     def divider():
         nonlocal y
@@ -483,7 +486,7 @@ def build_thermal_receipt_pdf(transaction_obj: SaleTransaction) -> HttpResponse:
 
     pdf.setFont("Courier-Bold", 10)
     pdf.drawString(left, y, "Item")
-    pdf.drawRightString(right - 18 * mm, y, "Qty")
+    pdf.drawRightString(qty_column, y, "Qty")
     pdf.drawRightString(right, y, "Amt")
     y -= row_height
     divider()
@@ -491,10 +494,10 @@ def build_thermal_receipt_pdf(transaction_obj: SaleTransaction) -> HttpResponse:
     total_qty = 0
     for item in items:
         total_qty += item.quantity
-        name = item.product.name[:22]
+        name = item.product.name[:name_limit]
         pdf.setFont("Courier", 10)
         pdf.drawString(left, y, name)
-        pdf.drawRightString(right - 18 * mm, y, str(item.quantity))
+        pdf.drawRightString(qty_column, y, str(item.quantity))
         pdf.drawRightString(right, y, f"{item.line_total:.2f}")
         y -= row_height
 
