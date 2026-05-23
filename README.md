@@ -1,6 +1,6 @@
-# POS Ingheng
+# POS Enghing
 
-POS Ingheng is a barcode-first point-of-sale system for school supply and general merchandise stores.
+POS Enghing is a barcode-first point-of-sale system for school supply and general merchandise stores.
 It is built with Django 5.2 and optimized for fast cashier throughput, inventory control, and admin workflows.
 All currency values are in Philippine Peso (PHP / P).
 

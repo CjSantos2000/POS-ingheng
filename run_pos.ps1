@@ -16,7 +16,7 @@ if (Test-Path '.venv/Scripts/python.exe') {
     $python = 'python'
 }
 
-Write-Host "Starting POS Ingheng on http://$hostName`:$port ..."
+Write-Host "Starting POS Enghing on http://$hostName`:$port ..."
 Write-Host "Opening login page: $loginUrl"
 
 Start-Job -ScriptBlock {

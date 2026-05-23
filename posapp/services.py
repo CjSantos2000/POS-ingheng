@@ -405,7 +405,7 @@ def build_receipt_pdf(transaction_obj: SaleTransaction) -> HttpResponse:
     y = height - 50
 
     pdf.setFont("Helvetica-Bold", 16)
-    pdf.drawString(50, y, "POS Ingheng Receipt")
+    pdf.drawString(50, y, "POS Enghing Receipt")
     y -= 25
     pdf.setFont("Helvetica", 11)
     pdf.drawString(50, y, f"Receipt: {transaction_obj.receipt_number}")
@@ -466,7 +466,7 @@ def build_thermal_receipt_pdf(transaction_obj: SaleTransaction) -> HttpResponse:
         y -= row_height
 
     pdf.setFont("Courier-Bold", 10)
-    pdf.drawCentredString(page_width / 2, y, "POS INGHENG")
+    pdf.drawCentredString(page_width / 2, y, "POS Enghing")
     y -= row_height
     pdf.setFont("Courier", 8)
     pdf.drawCentredString(page_width / 2, y, "Retail Invoice")

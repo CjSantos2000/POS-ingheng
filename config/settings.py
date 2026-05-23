@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "django-insecure-pos-ingheng-dev-key")
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "django-insecure-pos-Enghing-dev-key")
 DEBUG = os.getenv("DJANGO_DEBUG", "True").lower() == "true"
 ALLOWED_HOSTS = [host for host in os.getenv("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost").split(",") if host]
 
@@ -61,7 +61,7 @@ if DB_ENGINE == "mysql":
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.mysql",
-            "NAME": os.getenv("DB_NAME", "pos_ingheng"),
+            "NAME": os.getenv("DB_NAME", "pos_Enghing"),
             "USER": os.getenv("DB_USER", "root"),
             "PASSWORD": os.getenv("DB_PASSWORD", "root"),
             "HOST": os.getenv("DB_HOST", "127.0.0.1"),
@@ -105,7 +105,7 @@ LOGOUT_REDIRECT_URL = "login"
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
-        "LOCATION": "pos-ingheng-cache",
+        "LOCATION": "pos-Enghing-cache",
     }
 }
 

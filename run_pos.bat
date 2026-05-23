@@ -19,7 +19,7 @@ if exist ".venv\Scripts\python.exe" (
     )
 )
 
-echo Starting POS Ingheng on http://%HOST%:%PORT% ...
+echo Starting POS Enghing on http://%HOST%:%PORT% ...
 echo Opening login page: %LOGIN_URL%
 
 start "" powershell -NoProfile -WindowStyle Hidden -Command "Start-Sleep -Seconds 2; Start-Process '%LOGIN_URL%'"

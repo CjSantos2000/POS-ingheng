@@ -3,7 +3,7 @@ services:
     image: mysql:8.4
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: pos_ingheng
+      MYSQL_DATABASE: pos_Enghing
       MYSQL_ROOT_PASSWORD: root
     ports:
       - "3307:3306"
