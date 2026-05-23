@@ -24,9 +24,13 @@ let isProcessingScan = false;
 let barcodeTimeout = null;
 let isCheckoutModalOpen = false;
 let latestReceiptUrl = "";
+let latestThermalReceiptUrl = "";
+let latestA4ReceiptUrl = "";
 
-function openCheckoutModal(receiptNumber, receiptUrl) {
+function openCheckoutModal(receiptNumber, receiptUrl, thermalReceiptUrl, a4ReceiptUrl) {
     latestReceiptUrl = receiptUrl;
+    latestThermalReceiptUrl = thermalReceiptUrl || `${receiptUrl}?format=thermal&paper=58`;
+    latestA4ReceiptUrl = a4ReceiptUrl || `${receiptUrl}?format=pdf`;
     isCheckoutModalOpen = true;
     checkoutModalMessage.textContent = `Receipt ${receiptNumber} created. Print now?`;
     checkoutModal.classList.remove("hidden");
@@ -241,25 +245,25 @@ checkoutForm?.addEventListener("submit", async (event) => {
     try {
         const formData = new FormData(checkoutForm);
         const data = await postForm("/terminal/checkout/", Object.fromEntries(formData.entries()));
-        openCheckoutModal(data.receipt_number, data.receipt_url);
+        openCheckoutModal(data.receipt_number, data.receipt_url, data.thermal_receipt_url, data.a4_receipt_url);
     } catch (error) {
         setFeedback(error.message, true);
     }
 });
 
 printThermalButton?.addEventListener("click", () => {
-    if (!latestReceiptUrl) {
+    if (!latestThermalReceiptUrl) {
         return;
     }
-    openPrintWindow(`${latestReceiptUrl}?format=thermal&paper=58`);
+    openPrintWindow(latestThermalReceiptUrl);
     continueAfterCheckout();
 });
 
 printA4Button?.addEventListener("click", () => {
-    if (!latestReceiptUrl) {
+    if (!latestA4ReceiptUrl) {
         return;
     }
-    openPrintWindow(`${latestReceiptUrl}?format=pdf`);
+    openPrintWindow(latestA4ReceiptUrl);
     continueAfterCheckout();
 });
 

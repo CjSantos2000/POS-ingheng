@@ -104,7 +104,15 @@ def checkout(request):
         )
     except ValueError as exc:
         return JsonResponse({"error": str(exc)}, status=400)
-    return JsonResponse({"receipt_number": transaction_obj.receipt_number, "receipt_url": f"/transactions/{transaction_obj.id}/receipt/"})
+    receipt_base_url = f"/transactions/{transaction_obj.id}/receipt/"
+    return JsonResponse(
+        {
+            "receipt_number": transaction_obj.receipt_number,
+            "receipt_url": receipt_base_url,
+            "thermal_receipt_url": f"{receipt_base_url}?format=thermal&paper=58",
+            "a4_receipt_url": f"{receipt_base_url}?format=pdf",
+        }
+    )
 
 
 @login_required
