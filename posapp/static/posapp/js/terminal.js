@@ -251,7 +251,7 @@ printThermalButton?.addEventListener("click", () => {
     if (!latestReceiptUrl) {
         return;
     }
-    openPrintWindow(`${latestReceiptUrl}?format=thermal-pdf`);
+    openPrintWindow(`${latestReceiptUrl}?format=thermal&paper=58`);
     continueAfterCheckout();
 });
 
