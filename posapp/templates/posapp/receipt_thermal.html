@@ -84,8 +84,8 @@
         border: 1px solid #d9d9d9;
         padding: 10px 10px 14px;
         font-family: "Courier New", Courier, monospace;
-        font-size: 13px;
-        line-height: 1.35;
+        font-size: 14px;
+        line-height: 1.45;
     }
 
     .center {
@@ -94,17 +94,18 @@
 
     .thermal-receipt h3 {
         margin: 0;
-        font-size: 16px;
+        font-size: 18px;
         letter-spacing: 0.4px;
     }
 
     .thermal-receipt header p {
         margin: 2px 0 0;
+        font-size: 14px;
     }
 
     .divider {
         border-top: 1px solid #000;
-        margin: 8px 0;
+        margin: 10px 0;
     }
 
     .divider.dotted {
@@ -112,7 +113,7 @@
     }
 
     .thermal-receipt p {
-        margin: 2px 0;
+        margin: 3px 0;
         display: flex;
         justify-content: space-between;
         gap: 8px;
@@ -122,13 +123,15 @@
         display: grid;
         grid-template-columns: 1fr 42px 68px;
         font-weight: 700;
+        font-size: 14px;
     }
 
     .item-row {
         display: grid;
         grid-template-columns: 1fr 42px 68px;
         gap: 4px;
-        margin: 2px 0;
+        margin: 3px 0;
+        font-size: 14px;
     }
 
     .item-row .qty,
@@ -146,12 +149,12 @@
 
     .total {
         font-weight: 700;
-        font-size: 15px;
+        font-size: 17px;
     }
 
     .footer-note {
         margin-top: 10px;
-        font-size: 12px;
+        font-size: 13px;
     }
 
     @media print {
@@ -173,7 +176,22 @@
             width: 76mm;
             padding: 0;
             margin: 0 auto;
-            font-size: 12px;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .thermal-receipt h3 {
+            font-size: 19px;
+        }
+
+        .thermal-receipt header p,
+        .head-row,
+        .item-row {
+            font-size: 15px;
+        }
+
+        .total {
+            font-size: 18px;
         }
     }
 </style>

@@ -442,7 +442,7 @@ def build_thermal_receipt_pdf(transaction_obj: SaleTransaction) -> HttpResponse:
 
     items = list(transaction_obj.items.select_related("product"))
     page_width = 80 * mm
-    row_height = 5.5 * mm
+    row_height = 6.5 * mm
     base_height = 75 * mm
     computed_height = base_height + (len(items) * row_height) + (12 * row_height)
     page_height = max(computed_height, 140 * mm)
@@ -460,15 +460,15 @@ def build_thermal_receipt_pdf(transaction_obj: SaleTransaction) -> HttpResponse:
 
     def row(label: str, value: str, *, bold: bool = False):
         nonlocal y
-        pdf.setFont("Courier-Bold" if bold else "Courier", 8)
+        pdf.setFont("Courier-Bold" if bold else "Courier", 10)
         pdf.drawString(left, y, label)
         pdf.drawRightString(right, y, value)
         y -= row_height
 
-    pdf.setFont("Courier-Bold", 10)
+    pdf.setFont("Courier-Bold", 12)
     pdf.drawCentredString(page_width / 2, y, "POS Enghing")
     y -= row_height
-    pdf.setFont("Courier", 8)
+    pdf.setFont("Courier", 10)
     pdf.drawCentredString(page_width / 2, y, "Retail Invoice")
     y -= row_height
 
@@ -481,7 +481,7 @@ def build_thermal_receipt_pdf(transaction_obj: SaleTransaction) -> HttpResponse:
     row("Payment", transaction_obj.get_payment_method_display())
     divider()
 
-    pdf.setFont("Courier-Bold", 8)
+    pdf.setFont("Courier-Bold", 10)
     pdf.drawString(left, y, "Item")
     pdf.drawRightString(right - 18 * mm, y, "Qty")
     pdf.drawRightString(right, y, "Amt")
@@ -492,7 +492,7 @@ def build_thermal_receipt_pdf(transaction_obj: SaleTransaction) -> HttpResponse:
     for item in items:
         total_qty += item.quantity
         name = item.product.name[:22]
-        pdf.setFont("Courier", 8)
+        pdf.setFont("Courier", 10)
         pdf.drawString(left, y, name)
         pdf.drawRightString(right - 18 * mm, y, str(item.quantity))
         pdf.drawRightString(right, y, f"{item.line_total:.2f}")
@@ -510,7 +510,7 @@ def build_thermal_receipt_pdf(transaction_obj: SaleTransaction) -> HttpResponse:
     row("Cash tendered", f"{currency}{transaction_obj.total_amount:.2f}")
 
     y -= 2 * mm
-    pdf.setFont("Courier", 7)
+    pdf.setFont("Courier", 9)
     pdf.drawCentredString(page_width / 2, y, "THANK YOU. PLEASE COME AGAIN")
 
     pdf.showPage()
